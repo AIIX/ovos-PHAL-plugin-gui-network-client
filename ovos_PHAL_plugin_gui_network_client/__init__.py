@@ -40,6 +40,10 @@ class GuiNetworkClientPlugin(PHALPlugin):
         self.bus.on("ovos.phal.gui.network.client.internal.back",
                     self.display_internal_back)
         
+        # Also listen for certain events that can forcefully deactivate the client
+        self.bus.on("system.display.homescreen", self.clean_shutdown)
+        self.bus.on("mycroft.device.settings", self.clean_shutdown)
+        
         # Try Register the Client with WIFI Plugin on Startup
         self.register_client()
         
@@ -52,7 +56,7 @@ class GuiNetworkClientPlugin(PHALPlugin):
             "has_gui": True,
             "requires_input": True
         }))
-    
+
     def handle_registered(self, message=None):
         get_client = message.data.get("client", "")
         if get_client == self.name:
@@ -62,7 +66,7 @@ class GuiNetworkClientPlugin(PHALPlugin):
             self.bus.on(f"ovos.phal.wifi.plugin.activate.{self.client_id}", self.handle_activate_client_request)
             self.bus.on(f"ovos.phal.wifi.plugin.deactivate.{self.client_id}", self.handle_deactivate_client_request)
             LOG.info(f"Client Registered with WIFI Plugin: {self.client_id}")
-    
+
     def handle_deregistered(self, message=None):
         self.registered = False
         self.bus.remove(f"ovos.phal.wifi.plugin.activate.{self.client_id}", self.handle_active_client_request)
@@ -75,9 +79,12 @@ class GuiNetworkClientPlugin(PHALPlugin):
             LOG.info(f"Registration Failure: {error}")
             # Try to Register the Client with WIFI Plugin Again
             self.register_client()
-    
+
     def handle_activate_client_request(self, message=None):
         LOG.info("Gui Network Client Plugin Activated")
+        if self.client_active:
+            self.request_deactivate()
+
         self.client_active = True
         self.display_network_setup()
 
@@ -85,7 +92,7 @@ class GuiNetworkClientPlugin(PHALPlugin):
         LOG.info("Gui Network Client Plugin Deactivated")
         self.client_active = False
         self.gui.release()
-                
+
     def request_deactivate(self, message=None):
         self.bus.emit(Message("ovos.phal.wifi.plugin.remove.active.client", {
                       "client": "ovos-PHAL-plugin-gui-network-client"}))
@@ -105,6 +112,11 @@ class GuiNetworkClientPlugin(PHALPlugin):
         else:
             self.gui.release()
 
+    def clean_shutdown(self, message=None):
+        if self.client_active:
+            self.request_deactivate()
+            self.gui.release()
+
     def display_connected_network_settings(self, message=None):
         self.connected_network_details = message.data.get("connection_details", {})
         self.gui["connectionDetails"] = self.connected_network_details
@@ -114,7 +126,7 @@ class GuiNetworkClientPlugin(PHALPlugin):
         self.disconnected_network_details = message.data.get("connection_details", {})
         self.gui["connectionDetails"] = self.disconnected_network_details
         self.manage_setup_display("disconnected-network-settings", "network")
-        
+
     def display_internal_back(self, message=None):
         self.manage_setup_display("select-network", "network")
 
@@ -135,7 +147,7 @@ class GuiNetworkClientPlugin(PHALPlugin):
             self.speak_dialog("debug_wifi_error")
             sleep(5)
             self.display_network_setup()   
-    
+
     def display_failed_password(self):
         self.manage_setup_display("incorrect-password", "status")
         self.speak_dialog("debug_wifi_error")
@@ -181,7 +193,7 @@ class GuiNetworkClientPlugin(PHALPlugin):
             
     def handle_stop_setup(self, message=None):
         self.request_deactivate()
-        
+
     def shutdown(self):
         self.handle_stop_setup()
         super().shutdown()

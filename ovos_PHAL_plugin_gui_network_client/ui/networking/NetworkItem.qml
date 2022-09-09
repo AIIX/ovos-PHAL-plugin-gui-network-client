@@ -145,10 +145,8 @@ Kirigami.AbstractListItem {
             }
         } else if (model.ConnectionState == PlasmaNM.Enums.Deactivated) {
             networkingLoader.push(Qt.resolvedUrl("../networking/Connecting.qml"))
-            Mycroft.MycroftController.sendRequest("ovos.phal.nm.connect", {
-                "connection_name": model.ItemUniqueName,
-                "password": passwordLayer.password,
-                "security_type": model.SecurityTypeString
+            Mycroft.MycroftController.sendRequest("ovos.phal.nm.reconnect", {
+                "connection_name": model.ItemUniqueName
             })
         } else {
             Mycroft.MycroftController.sendRequest("ovos.phal.nm.disconnect", {
