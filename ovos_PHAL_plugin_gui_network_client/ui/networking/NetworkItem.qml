@@ -33,7 +33,6 @@ Kirigami.AbstractListItem {
                                                 model.SecurityType == PlasmaNM.Enums.Wpa2Psk)
 
     contentItem: Item {
-        implicitWidth: delegateLayout.implicitWidth;
         implicitHeight: delegateLayout.implicitHeight;
 
         ColumnLayout {
@@ -156,12 +155,5 @@ Kirigami.AbstractListItem {
                 "connection_name": model.ItemUniqueName
             })
         }
-    }
-
-    onPressAndHold: {
-        pathToRemove = model.ConnectionPath
-        nameToRemove = model.ItemUniqueName
-        networkActions.networkName = model.ItemUniqueName
-        networkActions.open()
     }
 }

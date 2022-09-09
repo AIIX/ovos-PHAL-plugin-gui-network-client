@@ -33,6 +33,12 @@ class GuiNetworkClientPlugin(PHALPlugin):
         # INTERNAL GUI EVENTS
         self.bus.on("ovos.phal.gui.network.client.back",
                     self.display_path_exit)
+        self.bus.on("ovos.phal.gui.display.connected.network.settings",
+                    self.display_connected_network_settings)
+        self.bus.on("ovos.phal.gui.display.disconnected.network.settings",
+                    self.display_disconnected_network_settings)
+        self.bus.on("ovos.phal.gui.network.client.internal.back",
+                    self.display_internal_back)
         
         # Try Register the Client with WIFI Plugin on Startup
         self.register_client()
@@ -99,6 +105,19 @@ class GuiNetworkClientPlugin(PHALPlugin):
         else:
             self.gui.release()
 
+    def display_connected_network_settings(self, message=None):
+        self.connected_network_details = message.data.get("connection_details", {})
+        self.gui["connectionDetails"] = self.connected_network_details
+        self.manage_setup_display("connected-network-settings", "network")
+
+    def display_disconnected_network_settings(self, message=None):
+        self.disconnected_network_details = message.data.get("connection_details", {})
+        self.gui["connectionDetails"] = self.disconnected_network_details
+        self.manage_setup_display("disconnected-network-settings", "network")
+        
+    def display_internal_back(self, message=None):
+        self.manage_setup_display("select-network", "network")
+
     def display_success(self, message=None):
         self.manage_setup_display("setup-completed", "status")
         sleep(5)
@@ -131,6 +150,14 @@ class GuiNetworkClientPlugin(PHALPlugin):
             self.gui["image"] = ""
             self.gui["label"] = ""
             self.gui["color"] = ""
+            self.gui.show_page(page, override_idle=True,
+                               override_animations=True)
+        elif state == "connected-network-settings" and page_type == "network":
+            self.gui["page_type"] = "ManageConnectedNetwork"
+            self.gui.show_page(page, override_idle=True,
+                               override_animations=True)
+        elif state == "disconnected-network-settings" and page_type == "network":
+            self.gui["page_type"] = "ManageUnconnectedNetwork"
             self.gui.show_page(page, override_idle=True,
                                override_animations=True)
         elif state == "setup-completed" and page_type == "status":
