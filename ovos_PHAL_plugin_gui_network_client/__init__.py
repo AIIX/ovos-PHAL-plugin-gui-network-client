@@ -1,12 +1,13 @@
 import random
-from os.path import dirname, join
-from time import sleep
-
 from mycroft_bus_client.message import Message, dig_for_message
+from os.path import dirname, join
 from ovos_plugin_manager.phal import PHALPlugin
+from ovos_utils import classproperty
 from ovos_utils.gui import GUIInterface
 from ovos_utils.log import LOG
+from ovos_utils.network_utils import NetworkRequirements
 from ovos_utils.network_utils import is_connected, get_ip
+from time import sleep
 
 
 class GuiNetworkClientPlugin(PHALPlugin):
@@ -18,14 +19,14 @@ class GuiNetworkClientPlugin(PHALPlugin):
         self.client_active = False
         self.client_id = None
         self.registered = False
-        
+
         # WIFI Plugin Registeration and Activation Specific Events        
         self.bus.on("ovos.phal.wifi.plugin.stop.setup.event", self.handle_stop_setup)
         self.bus.on("ovos.phal.wifi.plugin.client.registered", self.handle_registered)
         self.bus.on("ovos.phal.wifi.plugin.client.deregistered", self.handle_deregistered)
         self.bus.on("ovos.phal.wifi.plugin.client.registration.failure", self.handle_registration_failure)
         self.bus.on("ovos.phal.wifi.plugin.alive", self.register_client)
-        
+
         # OVOS PHAL NM EVENTS
         self.bus.on("ovos.phal.nm.connection.successful", self.display_success)
         self.bus.on("ovos.phal.nm.connection.failure", self.display_failure)
@@ -39,14 +40,49 @@ class GuiNetworkClientPlugin(PHALPlugin):
                     self.display_disconnected_network_settings)
         self.bus.on("ovos.phal.gui.network.client.internal.back",
                     self.display_internal_back)
-        
+
         # Also listen for certain events that can forcefully deactivate the client
         self.bus.on("system.display.homescreen", self.clean_shutdown)
         self.bus.on("mycroft.device.settings", self.clean_shutdown)
-        
+
         # Try Register the Client with WIFI Plugin on Startup
         self.register_client()
-        
+
+    @classproperty
+    def network_requirements(self):
+        """ developers should override this if they do not require connectivity
+         some examples:
+         IOT plugin that controls devices via LAN could return:
+            scans_on_init = True
+            NetworkRequirements(internet_before_load=False,
+                                 network_before_load=scans_on_init,
+                                 requires_internet=False,
+                                 requires_network=True,
+                                 no_internet_fallback=True,
+                                 no_network_fallback=False)
+         online search plugin with a local cache:
+            has_cache = False
+            NetworkRequirements(internet_before_load=not has_cache,
+                                 network_before_load=not has_cache,
+                                 requires_internet=True,
+                                 requires_network=True,
+                                 no_internet_fallback=True,
+                                 no_network_fallback=True)
+         a fully offline plugin:
+            NetworkRequirements(internet_before_load=False,
+                                 network_before_load=False,
+                                 requires_internet=False,
+                                 requires_network=False,
+                                 no_internet_fallback=True,
+                                 no_network_fallback=True)
+        """
+        return NetworkRequirements(internet_before_load=False,
+                                   network_before_load=False,
+                                   requires_internet=False,
+                                   requires_network=False,
+                                   no_internet_fallback=True,
+                                   no_network_fallback=True)
+
     # Wifi Plugin Registeration Handling
     def register_client(self, message=None):
         self.bus.emit(Message("ovos.phal.wifi.plugin.register.client", {
@@ -62,7 +98,7 @@ class GuiNetworkClientPlugin(PHALPlugin):
         if get_client == self.name:
             get_id = message.data.get("id", "")
             self.client_id = get_id
-            self.registered = True        
+            self.registered = True
             self.bus.on(f"ovos.phal.wifi.plugin.activate.{self.client_id}",
                         self.handle_activate_client_request)
             self.bus.on(f"ovos.phal.wifi.plugin.deactivate.{self.client_id}",
@@ -99,12 +135,12 @@ class GuiNetworkClientPlugin(PHALPlugin):
 
     def request_deactivate(self, message=None):
         self.bus.emit(Message("ovos.phal.wifi.plugin.remove.active.client", {
-                      "client": "ovos-PHAL-plugin-gui-network-client"}))
+            "client": "ovos-PHAL-plugin-gui-network-client"}))
         LOG.info("Gui Network Client Plugin Deactivation Requested")
 
     # Actual GUI Networking Operations
     def display_network_setup(self, message=None):
-        LOG.info("In Display Network Setup")     
+        LOG.info("In Display Network Setup")
         self.manage_setup_display("select-network", "network")
 
     def display_path_exit(self, message=None):
@@ -143,7 +179,7 @@ class GuiNetworkClientPlugin(PHALPlugin):
         self.request_deactivate()
 
     def display_failure(self, message=None):
-        """Wifi setup failed"""       
+        """Wifi setup failed"""
         errorCode = message.data.get("errorCode", "")
         if errorCode == "0":
             self.display_failed_password()
@@ -151,7 +187,7 @@ class GuiNetworkClientPlugin(PHALPlugin):
             self.manage_setup_display("setup-failed", "status")
             self.speak_dialog("debug_wifi_error")
             sleep(5)
-            self.display_network_setup()   
+            self.display_network_setup()
 
     def display_failed_password(self):
         self.manage_setup_display("incorrect-password", "status")
@@ -195,7 +231,7 @@ class GuiNetworkClientPlugin(PHALPlugin):
             self.gui["label"] = "Incorrect Password"
             self.gui["color"] = "#FF0000"
             self.gui.show_page(page, override_animations=True)
-            
+
     def handle_stop_setup(self, message=None):
         self.request_deactivate()
 
@@ -207,8 +243,8 @@ class GuiNetworkClientPlugin(PHALPlugin):
     @property
     def lang(self):
         return self.config.get("lang") or \
-            self.config_core.get("lang") or \
-            "en-us"
+               self.config_core.get("lang") or \
+               "en-us"
 
     def speak_dialog(self, key):
         """ Speak a random sentence from a dialog file.
