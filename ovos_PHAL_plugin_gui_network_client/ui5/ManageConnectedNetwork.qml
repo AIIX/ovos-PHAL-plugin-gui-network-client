@@ -15,15 +15,17 @@
  *
  */
 
-import QtQuick.Layouts 1.15
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import org.kde.kirigami 2.19 as Kirigami
+import QtQuick.Layouts 1.4
+import QtQuick 2.4
+import QtQuick.Controls 2.3
+import org.kde.plasma.core 2.0 as PlasmaCore
+import org.kde.plasma.components 2.0 as PlasmaComponents
+import org.kde.kirigami 2.8 as Kirigami
 import org.kde.plasma.networkmanagement 0.2 as PlasmaNM
 import Mycroft 1.0 as Mycroft
 
 Rectangle {
-    id: manageUnConnectedNetworkView
+    id: manageConnectedNetworkView
 
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
@@ -31,36 +33,10 @@ Rectangle {
     property var connection: sessionData.connectionDetails ? sessionData.connectionDetails : ""
     property string networkName: connection.networkName ? connection.networkName : ""
     property string networkSecurity: connection.networkSecurity ? connection.networkSecurity : ""
-    property string networkState: qsTr("Disconnected")
+    property string networkState: "Connected"
     property int networkStrength: connection.networkStrength ? connection.networkStrength : 0
-
-    function itemSignalIcon(signalState) {
-        if (signalState <= 25){
-            return "network-wireless-connected-25"
-        } else if (signalState <= 50){
-            return "network-wireless-connected-50"
-        } else if (signalState <= 75){
-            return "network-wireless-connected-75"
-        } else if (signalState <= 100){
-            return "network-wireless-connected-100"
-        } else {
-            return "network-wireless-connected-00"
-        }
-    }
-
-    function itemSignalString(signalState) {
-        if (signalState <= 25){
-            return "Poor"
-        } else if (signalState <= 50){
-            return "Average"
-        } else if (signalState <= 75){
-            return "Good"
-        } else if (signalState <= 100){
-            return "Excellent"
-        } else {
-            return "Unknown"
-        }
-    }
+    property string networkSpeed: connection.networkSpeed ? connection.networkSpeed : ""
+    property string networkAddress: sessionData.ipAddress ? sessionData.ipAddress : "127.0.0.1"
 
     Item {
         id: viewTopArea
@@ -124,7 +100,7 @@ Rectangle {
         }        
     }
 
-    Item {
+    Flickable {
         id: viewMiddleArea
         anchors.top: viewTopArea.bottom
         anchors.left: parent.left
@@ -132,6 +108,9 @@ Rectangle {
         anchors.bottom: viewBottomArea.top
         anchors.topMargin: Mycroft.Units.gridUnit / 2
         anchors.bottomMargin: Mycroft.Units.gridUnit
+        contentWidth: width
+        contentHeight: viewMiddleAreaLayout.implicitHeight
+        clip: true
 
         ColumnLayout {
             id: viewMiddleAreaLayout
@@ -143,12 +122,12 @@ Rectangle {
             anchors.topMargin: Mycroft.Units.gridUnit
 
             ViewPod {
-                id: networkStrength
+                id: networkSpeedPod
                 Layout.fillWidth: true
                 Layout.preferredHeight: Mycroft.Units.gridUnit * 3
-                podIcon: itemSignalIcon(manageUnConnectedNetworkView.networkStrength)
-                podMainText: qsTr("Network Strength")
-                podSubText: itemSignalString(manageUnConnectedNetworkView.networkStrength)
+                podIcon: "speedometer"
+                podMainText: "Network Speed"
+                podSubText: networkSpeed
             }
 
             ViewPod {
@@ -156,8 +135,17 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Mycroft.Units.gridUnit * 3
                 podIcon: "lock"
-                podMainText: qsTr("Security")
+                podMainText: "Security"
                 podSubText: networkSecurity
+            }
+
+            ViewPod {
+                id: ipAddressPod
+                Layout.fillWidth: true
+                Layout.preferredHeight: Mycroft.Units.gridUnit * 3
+                podIcon: "network-connect"
+                podMainText: "IP Address"
+                podSubText: networkAddress
             }
         }
     }
@@ -178,7 +166,7 @@ Rectangle {
                 id: backButton
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                buttonText: qsTr("Back")
+                buttonText: "Back"
                 buttonIcon: "arrow-left"
                 buttonAction: "ovos.phal.gui.network.client.internal.back"
             }
@@ -187,10 +175,10 @@ Rectangle {
                 id: forgetButton
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                buttonText: qsTr("Forget")
+                buttonText: "Forget"
                 buttonIcon: "user-trash-symbolic"
                 buttonAction: "ovos.phal.nm.forget"
-                connectionName: networkName
+                connectionName: manageConnectedNetworkView.networkName
             }
         }
     }

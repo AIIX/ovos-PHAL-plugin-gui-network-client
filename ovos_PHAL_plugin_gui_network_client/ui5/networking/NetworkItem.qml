@@ -15,10 +15,12 @@
  *
  */
 
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
+import QtQuick 2.2
+import QtQuick.Layouts 1.2
+import org.kde.plasma.components 2.0 as PlasmaComponents
+import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.networkmanagement 0.2 as PlasmaNM
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.kirigami 2.5 as Kirigami
 import Mycroft 1.0 as Mycroft
 
 Kirigami.AbstractListItem {
@@ -101,7 +103,7 @@ Kirigami.AbstractListItem {
                 result += ", " + model.SecurityTypeString
             return result
         } else if (model.ConnectionState == PlasmaNM.Enums.Activated) {
-                return qsTr("Connected")
+                return i18n("Connected")
         }
     }
     

@@ -15,11 +15,12 @@
  *
  */
 
-import QtQuick.Layouts 1.15
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.4
+import QtQuick 2.4
+import QtQuick.Controls 2.3
 import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.plasma.components 2.0 as PlasmaComponents
+import org.kde.kirigami 2.8 as Kirigami
 import org.kde.plasma.networkmanagement 0.2 as PlasmaNM
 import Mycroft 1.0 as Mycroft
 
@@ -75,6 +76,7 @@ Rectangle {
                 margins: Kirigami.Units.largeSpacing
             }
 
+
             Kirigami.Heading {
                 id: connectionTextHeading
                 level: 1
@@ -82,10 +84,9 @@ Rectangle {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 font.bold: true
-                text: qsTr("Select Your Wi-Fi")
+                text: i18n("Select Your Wi-Fi")
                 color: Kirigami.Theme.highlightColor
             }
-
             Item {
                 Layout.preferredHeight: Kirigami.Units.largeSpacing
             }
@@ -108,7 +109,6 @@ Rectangle {
                         handler.requestScan();
                     }
                 }
-
                 Timer {
                     id: refreshTimer
                     interval: 3000
@@ -140,7 +140,7 @@ Rectangle {
                     separatorVisible: false
                     visible: true
                     icon: "go-previous-symbolic"
-                    text: qsTr("Back")
+                    text: i18n("Back")
                     Layout.preferredWidth: implicitWidth + height
                     onClicked: {
                         Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("../sounds/ui_sounds_clicked.wav"))
@@ -148,16 +148,14 @@ Rectangle {
                         Mycroft.MycroftController.sendRequest("ovos.phal.gui.network.client.back", {})
                     }
                 }
-
                 Item {
                     Layout.fillWidth: true
                 }
-
                 Kirigami.BasicListItem {
                     Layout.fillWidth: false
                     separatorVisible: false
                     icon: "view-refresh"
-                    text: qsTr("Refresh")
+                    text: i18n("Refresh")
                     Layout.preferredWidth: implicitWidth + height
                     onClicked: {
                         Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("../sounds/ui_sounds_clicked.wav"))
@@ -165,7 +163,6 @@ Rectangle {
                         connectionView.contentY = -Kirigami.Units.gridUnit * 4;
                     }
                 }
-
             }
         }
     }
@@ -214,7 +211,7 @@ Rectangle {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 font.bold: true
-                text: qsTr("Enter Password For ") + connectionName
+                text: i18n("Enter Password For %1", connectionName)
                 color: Kirigami.Theme.highlightColor
             }
 
@@ -225,7 +222,7 @@ Rectangle {
                 Layout.leftMargin: Mycroft.Units.gridUnit * 5
                 Layout.rightMargin: Mycroft.Units.gridUnit * 5
                 Layout.preferredHeight: Mycroft.Units.gridUnit * 4
-                placeholderText: qsTr("Password...")
+                placeholderText: i18n("Password...")
 
                 validator: RegExpValidator {
                     regExp: if (securityType == PlasmaNM.Enums.StaticWep) {
@@ -251,7 +248,7 @@ Rectangle {
                 Button {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Mycroft.Units.gridUnit * 5
-                    text: qsTr("Connect")
+                    text: i18n("Connect")
                     onClicked: {
                         Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("../sounds/ui_sounds_clicked.wav"))
                         passField.accepted();
@@ -261,14 +258,13 @@ Rectangle {
                 Button {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Mycroft.Units.gridUnit * 5
-                    text: qsTr("Cancel")
+                    text: i18n("Cancel")
                     onClicked: {
                         Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("../sounds/ui_sounds_clicked.wav"))
                         passwordLayer.close();
                     }
                 }
             }
-
             Item {
                 Layout.fillHeight: true
             }
