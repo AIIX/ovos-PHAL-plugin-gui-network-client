@@ -15,10 +15,12 @@
  *
  */
 
-import QtQuick.Layouts 1.15
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import org.kde.kirigami 2.19 as Kirigami
+import QtQuick.Layouts 1.4
+import QtQuick 2.4
+import QtQuick.Controls 2.3
+import org.kde.plasma.core 2.0 as PlasmaCore
+import org.kde.plasma.components 2.0 as PlasmaComponents
+import org.kde.kirigami 2.8 as Kirigami
 import org.kde.plasma.networkmanagement 0.2 as PlasmaNM
 import Mycroft 1.0 as Mycroft
 
@@ -31,7 +33,7 @@ Rectangle {
     property var connection: sessionData.connectionDetails ? sessionData.connectionDetails : ""
     property string networkName: connection.networkName ? connection.networkName : ""
     property string networkSecurity: connection.networkSecurity ? connection.networkSecurity : ""
-    property string networkState: qsTr("Disconnected")
+    property string networkState: "Disconnected"
     property int networkStrength: connection.networkStrength ? connection.networkStrength : 0
 
     function itemSignalIcon(signalState) {
@@ -147,7 +149,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Mycroft.Units.gridUnit * 3
                 podIcon: itemSignalIcon(manageUnConnectedNetworkView.networkStrength)
-                podMainText: qsTr("Network Strength")
+                podMainText: "Network Strength"
                 podSubText: itemSignalString(manageUnConnectedNetworkView.networkStrength)
             }
 
@@ -156,7 +158,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Mycroft.Units.gridUnit * 3
                 podIcon: "lock"
-                podMainText: qsTr("Security")
+                podMainText: "Security"
                 podSubText: networkSecurity
             }
         }
@@ -178,7 +180,7 @@ Rectangle {
                 id: backButton
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                buttonText: qsTr("Back")
+                buttonText: "Back"
                 buttonIcon: "arrow-left"
                 buttonAction: "ovos.phal.gui.network.client.internal.back"
             }
@@ -187,7 +189,7 @@ Rectangle {
                 id: forgetButton
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                buttonText: qsTr("Forget")
+                buttonText: "Forget"
                 buttonIcon: "user-trash-symbolic"
                 buttonAction: "ovos.phal.nm.forget"
                 connectionName: networkName

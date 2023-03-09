@@ -15,13 +15,15 @@
  *
  */
 
-import QtQuick.Layouts 1.15
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import org.kde.kirigami 2.19 as Kirigami
+import QtQuick.Layouts 1.4
+import QtQuick 2.4
+import QtQuick.Controls 2.3
+import org.kde.plasma.core 2.0 as PlasmaCore
+import org.kde.plasma.components 2.0 as PlasmaComponents
+import org.kde.kirigami 2.8 as Kirigami
 import org.kde.plasma.networkmanagement 0.2 as PlasmaNM
 import Mycroft 1.0 as Mycroft
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 
 Rectangle {
     id: bottomActionButtonControl
@@ -61,7 +63,7 @@ Rectangle {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: (mouse)=> {
+        onClicked: {
             Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/ui_sounds_clicked.wav"))
             if (connectionName){
                 console.log("Deleting " + connectionName)
@@ -72,11 +74,11 @@ Rectangle {
             }
         }
 
-        onPressed: (mouse)=> {
+        onPressed: {
             bottomActionButtonControl.color = Qt.darker(Kirigami.Theme.backgroundColor, 0.8)
         }
 
-        onReleased: (mouse)=> {
+        onReleased: {
             bottomActionButtonControl.color = Qt.lighter(Kirigami.Theme.backgroundColor, 0.8)
         }
     }

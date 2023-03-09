@@ -15,12 +15,10 @@
  *
  */
 
-import QtQuick.Layouts 1.4
-import QtQuick 2.4
-import QtQuick.Controls 2.3
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 2.0 as PlasmaComponents
-import org.kde.kirigami 2.8 as Kirigami
+import QtQuick.Layouts 1.15
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import org.kde.kirigami 2.19 as Kirigami
 import org.kde.plasma.networkmanagement 0.2 as PlasmaNM
 import Mycroft 1.0 as Mycroft
 
@@ -33,7 +31,7 @@ Rectangle {
     property var connection: sessionData.connectionDetails ? sessionData.connectionDetails : ""
     property string networkName: connection.networkName ? connection.networkName : ""
     property string networkSecurity: connection.networkSecurity ? connection.networkSecurity : ""
-    property string networkState: "Connected"
+    property string networkState: qsTr("Connected")
     property int networkStrength: connection.networkStrength ? connection.networkStrength : 0
     property string networkSpeed: connection.networkSpeed ? connection.networkSpeed : ""
     property string networkAddress: sessionData.ipAddress ? sessionData.ipAddress : "127.0.0.1"
@@ -126,7 +124,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Mycroft.Units.gridUnit * 3
                 podIcon: "speedometer"
-                podMainText: "Network Speed"
+                podMainText: qsTr("Network Speed")
                 podSubText: networkSpeed
             }
 
@@ -135,7 +133,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Mycroft.Units.gridUnit * 3
                 podIcon: "lock"
-                podMainText: "Security"
+                podMainText: qsTr("Security")
                 podSubText: networkSecurity
             }
 
@@ -144,7 +142,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Mycroft.Units.gridUnit * 3
                 podIcon: "network-connect"
-                podMainText: "IP Address"
+                podMainText: qsTr("IP Address")
                 podSubText: networkAddress
             }
         }
@@ -166,7 +164,7 @@ Rectangle {
                 id: backButton
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                buttonText: "Back"
+                buttonText: qsTr("Back")
                 buttonIcon: "arrow-left"
                 buttonAction: "ovos.phal.gui.network.client.internal.back"
             }
@@ -175,7 +173,7 @@ Rectangle {
                 id: forgetButton
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                buttonText: "Forget"
+                buttonText: qsTr("Forget")
                 buttonIcon: "user-trash-symbolic"
                 buttonAction: "ovos.phal.nm.forget"
                 connectionName: manageConnectedNetworkView.networkName
